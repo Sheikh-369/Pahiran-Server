@@ -124,6 +124,53 @@ class AuthController{
         })
     }
 
+    static async resetPassword(req:Request,res:Response){
+        const{userEmail,OTP,newPassword,confirmNewPassword}=req.body
+        //validations
+        if(!userEmail || !OTP || !newPassword|| !confirmNewPassword){
+            res.status(400).json({
+                message:"Please fill all the fields."
+            })
+            return
+        }
+        //existing user
+        const existingUser=await User.findOne({where:{userEmail}})
+        if(!existingUser){
+            res.status(400).json({
+                message:"Email not found."
+            })
+            return
+        }
+        // Check if OTP is expired
+        if (!existingUser.OTP || !existingUser.OTPExpiry || new Date() > new Date(existingUser.OTPExpiry)) {
+            return res.status(400).json({
+                message: "OTP has expired. Please request a new one."
+            });
+        }
+
+        // OPTIONAL: If you hashed the OTP, use bcrypt.compareSync here instead
+        if (existingUser.OTP !== OTP.toString()) {
+            return res.status(400).json({
+                message: "Invalid OTP."
+            });
+        }
+
+        // Hash the new password and save
+        const hashedPassword = bcrypt.hashSync(newPassword, 10);
+        existingUser.userPassword = hashedPassword;
+
+        // Clear OTP fields
+        existingUser.OTP = null;
+        existingUser.OTPGeneratedTime = null;
+        existingUser.OTPExpiry = null;
+
+        await existingUser.save();
+
+        return res.status(200).json({
+            message: "Password has been reset successfully."
+        });
+    }
+
 }
 
 export default AuthController
