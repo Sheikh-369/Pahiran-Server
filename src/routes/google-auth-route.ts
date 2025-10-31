@@ -52,7 +52,7 @@ router.get("/auth/google/callback", async (req: Request, res: Response) => {
         userEmail: payload.email,
         userPassword: await bcrypt.hash(Math.random().toString(36), 10),
         userPhoneNumber: "", // optional
-        role: "Customer",    // default role
+        role: "customer",    // default role
         userPicture: payload.picture || null,
       });
     }
