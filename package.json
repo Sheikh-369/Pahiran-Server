@@ -1,44 +1,40 @@
 {
-  "name": "express-ts-server",
+  "name": "server",
   "version": "1.0.0",
-  "main": "dist/index.js",
+  "main": "src/server.ts",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "nodemon --exec ts-node src/server.ts"
   },
+
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
+    "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^4.21.2",
-    "express-session": "^1.18.2",
-    "google-auth-library": "^10.4.2",
+    "dotenv": "^17.2.0",
+    "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
-    "nodemailer": "^7.0.10",
-    "passport": "^0.7.0",
-    "passport-google-oauth2": "^0.2.0",
+    "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7",
-    "sequelize-typescript": "^2.1.6"
+    "sequelize-typescript": "^2.1.6",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.25",
-    "@types/express-session": "^1.18.2",
+    "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
-    "@types/nodemailer": "^7.0.3",
-    "@types/passport": "^1.0.17",
-    "@types/passport-google-oauth2": "^0.1.10",
-    "@types/sequelize": "^4.28.20",
+    "@types/node": "^24.0.15",
+    "@types/nodemailer": "^6.4.17",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.8.3"
   }
 }

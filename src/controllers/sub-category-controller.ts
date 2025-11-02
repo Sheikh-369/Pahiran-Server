@@ -20,7 +20,7 @@ export const seedSubCategories = async () => {
     });
   }
 
-  console.log('Subcategories seeded successfully');
+  console.log('✅Subcategories seeded successfully');
 };
 
 // Create a new subcategory

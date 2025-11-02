@@ -189,6 +189,14 @@ class AuthController {
       message: "Password has been reset successfully.",
     });
   }
+
+  static async fetchAllUsers(req:Request,res:Response){
+    const users=await User.findAll()
+    res.status(200).json({
+      message:"All users fetched successfully.",
+      data:users
+    })
+  }
 }
 
 export default AuthController;

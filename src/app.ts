@@ -1,5 +1,4 @@
 import express from "express";
-import "./database/connection";
 import cors from "cors";
 const app = express();
 
@@ -7,7 +6,7 @@ import authRoute from "./routes/user-route";
 import categoryRoute from "./routes/category-route"
 import subCategoryRoute from "./routes/sub-category-route"
 import productRoute from "./routes/product-route"
-import googleAuthRoute from "./routes/google-auth-route"; 
+// import googleAuthRoute from "./routes/google-auth-route"; 
 app.use(express.json());
 
 app.use(
@@ -25,6 +24,6 @@ app.use("/washtra",subCategoryRoute)
 //product
 app.use("/washtra",productRoute)
 //google oauth
-app.use("/washtra", googleAuthRoute);
+// app.use("/washtra", googleAuthRoute);
 
 export default app;

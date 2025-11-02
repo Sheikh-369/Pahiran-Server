@@ -17,7 +17,7 @@ export const seedDefaultCategories = async () => {
     });
   }
 
-  console.log('Categories seeded successfully');
+  console.log('✅Categories seeded successfully');
 };
 
 

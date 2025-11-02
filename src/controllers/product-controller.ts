@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import Product from '../database/models/product-model';
+import Category from '../database/models/category-model';
+import { Op } from 'sequelize';
 
 
 // Create a new product
@@ -111,4 +113,37 @@ export const deleteProduct = async (req: Request, res: Response) => {
   await product.destroy();
 
   res.status(200).json({ message: 'Product deleted successfully!' });
+};
+
+export const getByCategory = async (req: Request, res: Response) => {
+  const { categoryName } = req.params;
+
+  if (!categoryName) {
+    return res.status(400).json({ message: "categoryName is required!" });
+  }
+
+  const products = await Product.findAll({
+    include: [
+      {
+        model: Category,
+        where: {
+          categoryName: {
+            [Op.iLike]: categoryName, // Case-insensitive match
+          },
+        },
+        attributes: ['categoryName'],
+      },
+    ],
+  });
+
+  if (products.length === 0) {
+    return res.status(404).json({
+      message: `No products found for category "${categoryName}"`,
+    });
+  }
+
+  res.status(200).json({
+    message: `${categoryName} products fetched successfully`,
+    data: products,
+  });
 };
