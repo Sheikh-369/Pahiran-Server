@@ -115,6 +115,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
   res.status(200).json({ message: 'Product deleted successfully!' });
 };
 
+//Fetch product by category
 export const getByCategory = async (req: Request, res: Response) => {
   const { categoryName } = req.params;
 
