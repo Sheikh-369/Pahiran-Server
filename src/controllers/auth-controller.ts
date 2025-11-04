@@ -70,7 +70,7 @@ class AuthController {
 
     if (!existingUser) {
       res.status(400).json({
-        message: "Eamil not registered.",
+        message: "Email not registered.",
       });
       return;
     }
@@ -93,6 +93,12 @@ class AuthController {
     res.status(200).json({
       message: "Login Successful.",
       token,
+      data:{
+        id:existingUser.id,
+        name:existingUser.userName,
+        email:existingUser.userEmail,
+        role:existingUser.role
+      }
     });
   }
 

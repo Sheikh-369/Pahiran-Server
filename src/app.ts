@@ -7,6 +7,7 @@ import categoryRoute from "./routes/category-route"
 import subCategoryRoute from "./routes/sub-category-route"
 import productRoute from "./routes/product-route"
 import cartRoute from "./routes/cart-route"
+import orderRoute from "./routes/order-route"
 // import googleAuthRoute from "./routes/google-auth-route"; 
 app.use(express.json());
 
@@ -26,6 +27,8 @@ app.use("/washtra",subCategoryRoute)
 app.use("/washtra",productRoute)
 //cart
 app.use("/washtra",cartRoute)
+//order
+app.use("/washtra",orderRoute)
 //google oauth
 // app.use("/washtra", googleAuthRoute);
 
