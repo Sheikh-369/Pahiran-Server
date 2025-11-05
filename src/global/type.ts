@@ -1,20 +1,20 @@
 
 
 export enum PaymentMethods {
-  COD = "COD",
-  QR = "QR",
+  COD = "cod",
+  QR = "qr",
 }
 
 export enum OrderStatus {
-  Pending = "Pending",
-  Preparing = "Preparing",
-  Shipped = "Shipped",
-  Delivered = "Delivered",
-  Cancelled = "Cancelled",
+  Pending = "pending",
+  Preparing = "preparing",
+  Shipped = "shipped",
+  Delivered = "delivered",
+  Cancelled = "cancelled",
 }
 
 export enum PaymentStatus {
-  Pending = "Pending",
-  Paid = "Paid",
-  Failed = "Failed",
+  Pending = "pending",
+  Paid = "paid",
+  Failed = "failed",
 }

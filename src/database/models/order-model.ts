@@ -9,6 +9,7 @@ import {
 } from "sequelize-typescript";
 import OrderDetails from "./order-details-model";
 import Payment from "./payment-model";
+import User from "./user-model";
 
 @Table({
   tableName: "orders",
@@ -22,6 +23,11 @@ class Order extends Model {
     defaultValue: DataType.UUIDV4,
   })
   declare id: string;
+
+    // 👇 Link to the user who placed the order
+  @ForeignKey(() => User)
+  @Column({ type: DataType.UUID, allowNull: false })
+  declare userId: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
   declare firstName: string;

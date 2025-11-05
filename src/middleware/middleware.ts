@@ -18,7 +18,7 @@ export enum Role{
 }
 
 class Middleware{
-    static  async isLoggedI(req:IExtendedRequest,res:Response,next:NextFunction){
+    static  async isLoggedIn(req:IExtendedRequest,res:Response,next:NextFunction){
         const token=req.headers.authorization
         if(!token){
             res.status(400).json({
