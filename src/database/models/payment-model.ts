@@ -34,10 +34,10 @@ class Payment extends Model {
 
   // 👇 Status: pending / completed / failed
   @Column({
-    type: DataType.ENUM("pending", "completed", "failed"),
+    type: DataType.ENUM("pending", "paid", "failed"),
     defaultValue: "pending",
   })
-  declare paymentStatus: "pending" | "completed" | "failed";
+  declare paymentStatus: "pending" | "paid" | "failed";
 
   // 👇 Optional field for QR screenshot (Cloudinary URL)
   @Column({

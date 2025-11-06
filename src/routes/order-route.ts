@@ -26,4 +26,19 @@ router.route("/my-orders/:id").get(
     asyncErrorHandler(orderController.getOrderById)
 )
 
+//all orders for admin
+router.route("/all-orders").get(
+    Middleware.isLoggedIn,
+    Middleware.accessTo(Role.Admin),
+    asyncErrorHandler(orderController.getAllOrdersForAdmin)
+)
+
+// Admin can update order
+router.route("/order/:orderId").patch(
+    Middleware.isLoggedIn,
+    Middleware.accessTo(Role.Admin),
+    asyncErrorHandler(orderController.editOrder)  
+)
+
+
 export default router

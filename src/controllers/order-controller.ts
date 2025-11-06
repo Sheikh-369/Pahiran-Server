@@ -1,132 +1,3 @@
-// import { Request, Response } from "express";
-// import Order from "../database/models/order-model";
-// import { OrderStatus, PaymentMethods, PaymentStatus } from "../global/type";
-// import Payment from "../database/models/payment-model";
-// import OrderDetails from "../database/models/order-details-model";
-// import Cart from "../database/models/cart-model";
-
-// interface OrderRequest extends Request {
-//   user?: {
-//     id: string;
-//   };
-// }
-
-// interface IProduct {
-//   productId: string;
-//   orderQuantity: number;
-// }
-
-// class OrderController {
-//   async createOrder(req: OrderRequest, res: Response) {
-//     const userId = req.user?.id || null
-
-//     const {
-//       firstName,
-//       lastName,
-//       phoneNumber,
-//       email,
-//       province,
-//       district,
-//       city,
-//       tole,
-//       totalAmount,
-//       paymentMethod
-//     } = req.body;
-//     const products: IProduct[] = req.body.products;
-
-//     if (
-//       !firstName ||
-//       !lastName ||
-//       !phoneNumber ||
-//       !province ||
-//       !district ||
-//       !city ||
-//       !tole ||
-//       !totalAmount ||
-//       !paymentMethod ||
-//       !products ||
-//       products.length === 0
-//     ) {
-//       return res.status(400).json({ message: "Please fill all required fields!" });
-//     }
-
-//     // Create the order
-//     const orderData = await Order.create({
-//       firstName,
-//       lastName,
-//       phoneNumber,
-//       email: email || null,
-//       province,
-//       district,
-//       city,
-//       tole,
-//       totalAmount,
-//       userId,
-//       orderStatus: OrderStatus.Pending,
-//     });
-
-//     // Create OrderDetails
-//     for (const product of products as IProduct[]) {
-//       await OrderDetails.create({
-//         orderId: orderData.id,
-//         productId: product.productId,
-//         orderQuantity: product.orderQuantity,
-//       });
-//     }
-
-//     // Handle Payment separately
-//     let paymentData;
-
-//     if (paymentMethod === PaymentMethods.COD) {
-//       // Cash on Delivery
-//       paymentData = await Payment.create({
-//         orderId: orderData.id,
-//         paymentMethod: PaymentMethods.COD,
-//         paymentStatus: PaymentStatus.Pending, // Will be updated once delivered
-//         qrScreenshot: null,
-//       });
-//     } else if (paymentMethod === PaymentMethods.QR) {
-//       // QR Payment requires screenshot
-//       if (!req.file) {
-//         return res.status(400).json({ message: "Please upload QR payment screenshot!" });
-//       }
-
-//       paymentData = await Payment.create({
-//         orderId: orderData.id,
-//         paymentMethod: PaymentMethods.QR,
-//         paymentStatus: PaymentStatus.Pending, // Will be verified later
-//         qrScreenshot: req.file.path, // Cloudinary URL
-//       });
-//     } else {
-//       return res.status(400).json({ message: "Invalid payment method!" });
-//     }
-
-//     // Attach paymentId to order
-//     orderData.paymentId = paymentData.id;
-//     await orderData.save();
-
-//     // Remove products from cart
-//     const productIds = products.map((p: IProduct) => p.productId);
-//     await Cart.destroy({
-//       where: {
-//         userId,
-//         productId: productIds,
-//       },
-//     });
-
-//     return res.status(200).json({
-//       message: `Order created successfully with ${paymentMethod} payment!`,
-//       data: {
-//         orderId: orderData.id,
-//         paymentId: paymentData.id,
-//       },
-//     });
-//   }
-// }
-
-// export default new OrderController();
-
-//2nd
 import { Request, Response } from "express";
 import Order from "../database/models/order-model";
 import { OrderStatus, PaymentMethods, PaymentStatus } from "../global/type";
@@ -358,6 +229,121 @@ class OrderController {
     res.status(200).json({
       message: "Order fetched successfully",
       data: order
+    });
+  }
+
+  // ✅ Get all orders (Admin View)
+  async getAllOrdersForAdmin(req: Request, res: Response) {
+    const orders = await Order.findAll({
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "phoneNumber",
+        "totalAmount",
+        "orderStatus",
+        "createdAt"
+      ],
+      include: [
+        {
+          model: Payment,
+          as: "payment",
+          attributes: ["paymentMethod", "paymentStatus", "qrScreenshot"]
+        },
+        {
+          model: OrderDetails,
+          as: "orderDetails",
+          attributes: ["orderQuantity"],
+          include: [
+            {
+              model: Product,
+              as: "product",
+              attributes: ["productImage"]
+            }
+          ]
+        }
+      ],
+      order: [["createdAt", "DESC"]]
+    });
+
+    const formattedOrders = orders.map(order => {
+      const firstProduct = order.orderDetails?.[0]?.product;
+      const firstProductImage = firstProduct?.productImage || null;
+      const quantity = order.orderDetails?.reduce(
+        (sum, item) => sum + (item.orderQuantity || 0),
+        0
+      );
+
+      return {
+        orderId: order.id,
+        customerName: `${order.firstName} ${order.lastName}`,
+        phoneNumber: order.phoneNumber,
+        productImage: firstProductImage,
+        quantity,
+        totalAmount: order.totalAmount,
+        orderStatus: order.orderStatus,
+        paymentMethod: order.payment?.paymentMethod || null,
+        paymentStatus: order.payment?.paymentStatus || null,
+        qr: order.payment?.qrScreenshot || null,
+        orderPlacedOn: order.createdAt
+      };
+    });
+
+    res.status(200).json({
+      message: "Admin orders fetched successfully",
+      data: formattedOrders
+    });
+  }
+
+    // Edit order status and/or payment status (Admin only)
+  async editOrder(req: OrderRequest, res: Response) {
+    const { orderId } = req.params;
+    const { orderStatus, paymentStatus } = req.body;
+
+    // Validate input
+    if (!orderStatus && !paymentStatus) {
+      return res.status(400).json({
+        message: "Please provide at least orderStatus or paymentStatus to update.",
+      });
+    }
+
+    // Validate allowed values
+    if (orderStatus && !Object.values(OrderStatus).includes(orderStatus)) {
+      return res.status(400).json({ message: "Invalid orderStatus value." });
+    }
+
+    if (paymentStatus && !Object.values(PaymentStatus).includes(paymentStatus)) {
+      return res.status(400).json({ message: "Invalid paymentStatus value." });
+    }
+
+    // Find order
+    const order = await Order.findByPk(orderId, {
+      include: [{ model: Payment, as: "payment" }],
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    // Update order status if provided
+    if (orderStatus) {
+      order.orderStatus = orderStatus;
+      await order.save();
+    }
+
+    // Update payment status if provided
+    if (paymentStatus && order.payment) {
+      order.payment.paymentStatus = paymentStatus;
+      await order.payment.save();
+    }
+
+    res.status(200).json({
+      message: "Order updated successfully.",
+      data: {
+        orderId: order.id,
+        orderStatus: order.orderStatus,
+        paymentStatus: order.payment?.paymentStatus || null,
+      },
     });
   }
 
