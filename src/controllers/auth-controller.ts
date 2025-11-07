@@ -203,6 +203,76 @@ class AuthController {
       data:users
     })
   }
+
+  // Fetch single user by ID
+  static async getUserById(req: Request, res: Response){
+    const { id } = req.params; // using 'id'
+
+    const user = await User.findByPk(id, {
+      attributes: { exclude: ['userPassword'] } // exclude password
+    });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, data: user });
+  };
+
+  //update profile
+  static async updateProfile(req: Request, res: Response) {
+    const { id } = req.params;
+    const { 
+      userName, bio, addressLine, province, district, city, tole, userPhoneNumber, 
+      oldPassword, newPassword, confirmPassword 
+    } = req.body;
+
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Update basic fields
+    if (userName) user.userName = userName;
+    if (bio) user.bio = bio;
+    if (addressLine) user.addressLine = addressLine;
+    if (province) user.province = province;
+    if (district) user.district = district;
+    if (city) user.city = city;
+    if (tole) user.tole = tole;
+    if (userPhoneNumber) user.userPhoneNumber = userPhoneNumber;
+
+    // Update profile image
+    if (req.file) user.profileImage = req.file.path;
+
+    // Handle password change
+    if (oldPassword || newPassword || confirmPassword) {
+      if (!oldPassword || !newPassword || !confirmPassword) {
+        return res.status(400).json({ message: "Please provide old, new and confirm passwords." });
+      }
+
+      const isMatch = await bcrypt.compare(oldPassword, user.userPassword);
+      if (!isMatch) {
+        return res.status(400).json({ message: "Old password is incorrect." });
+      }
+
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({ message: "New password and confirm password do not match." });
+      }
+
+      user.userPassword = await bcrypt.hash(newPassword, 10);
+    }
+
+    await user.save();
+
+    const { userPassword, ...safeUser } = user.get({ plain: true });
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: safeUser,
+    });
+  }
+
+
 }
 
 export default AuthController;

@@ -148,3 +148,16 @@ export const getByCategory = async (req: Request, res: Response) => {
     data: products,
   });
 };
+
+export const getFeaturedProducts=async(req: Request, res: Response) =>{
+        const data = await Product.findAll({
+            where: {
+            isFeatured: true,
+            },
+        });
+
+        res.status(200).json({
+            message: "Featured products fetched successfully",
+            data,
+        });
+    }

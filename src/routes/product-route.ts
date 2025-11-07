@@ -1,6 +1,6 @@
 import express,{ Router } from 'express';
 import asyncErrorHandler from '../services/async-error-handler';
-import { createProduct, deleteProduct, getAllProducts, getByCategory, getProductById, updateProduct } from '../controllers/product-controller';
+import { createProduct, deleteProduct, getAllProducts, getByCategory, getFeaturedProducts, getProductById, updateProduct } from '../controllers/product-controller';
 import upload from '../middleware/multer-upload';
 
 const router:Router =express.Router();
@@ -24,8 +24,13 @@ router.route('/product/:id').patch(
 router.route('/product/:id').delete(asyncErrorHandler(deleteProduct));
 
 // Get products by category
-router.route('/products/category/:categoryName')
-  .get(asyncErrorHandler(getByCategory)
+router.route('/products/category/:categoryName').get(
+  asyncErrorHandler(getByCategory)
 );
+
+//featured products
+router.route("/products/featured").get(
+  asyncErrorHandler(getFeaturedProducts)
+)
 
 export default router

@@ -63,6 +63,51 @@ class User extends Model {
     allowNull: true,
   })
   declare OTPExpiry: Date | null;
+
+  //updated columns for 🔹Profile Fields
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+    defaultValue: "https://your-cdn.com/default-profile.png",
+  })
+  declare profileImage: string | null; // URL of user's profile picture
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  declare bio: string | null; // Short description or about user
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare addressLine: string | null; // Street / house address
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare province: string | null;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare district: string | null;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare city: string | null;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  declare tole: string | null;
 }
 
 export default User;
